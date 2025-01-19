@@ -17,12 +17,19 @@ Proyek ini bertujuan untuk memecahkan masalah pencarian jalur terpendek dalam gr
 ## Algoritma yang Digunakan
 
 ### Algoritma Dijkstra
-Algoritma Dijkstra adalah metode pencarian jalur terpendek berbasis greedy yang bekerja dengan mengevaluasi semua kemungkinan lintasan untuk menemukan rute optimal dalam graf berbobot non-negatif. Dalam implementasi ini:
-- Graf direpresentasikan sebagai graf berarah (directed graph).
-- Simpul awal adalah rumah Aldi (H) dan simpul tujuan adalah rumah sakit (RS).
-- Jalur yang dihasilkan adalah **H → P2 → P3 → P4 → RS** dengan jarak total 17.
+**Deskripsi**: 
+Algoritma Dijkstra adalah algoritma pencarian jalur terpendek yang bekerja dengan mengevaluasi semua lintasan dalam graf berbobot non-negatif. Algoritma ini menggunakan pendekatan greedy, di mana setiap langkah memilih simpul dengan jarak terpendek dari simpul awal untuk dilanjutkan. Algoritma ini menjamin hasil yang optimal pada graf berbobot non-negatif.
 
-#### Kode Implementasi (Python):
+#### Implementasi
+1. **Library NetworkX**:
+   - **Kenapa menggunakan NetworkX?** Library ini menyediakan fungsi bawaan untuk manipulasi graf, sehingga mempermudah representasi graf berarah dan bobotnya.
+   - Fungsi `dijkstra_path` digunakan untuk menemukan jalur terpendek, dan `dijkstra_path_length` untuk menghitung jarak total jalur tersebut.
+
+2. **Representasi Graf**:
+   - Node pada graf melambangkan titik-titik seperti rumah (H), persimpangan jalan (P1, P2, dst.), dan rumah sakit (RS).
+   - Edge (sisi) pada graf memiliki bobot yang merepresentasikan jarak antar node.
+
+3. **Kode Python**:
 ```python
 import networkx as nx
 
@@ -31,7 +38,7 @@ G = nx.DiGraph()
 edges = [
     ('H', 'P1', 4),
     ('H', 'P2', 3),
-    ('P1', 'P5', 5),
+    ('P1', 'P5', 5), 
     ('P2', 'P3', 7),
     ('P2', 'P4', 10),
     ('P3', 'P4', 2),
@@ -50,12 +57,36 @@ print("Jalur terpendek:", " -> ".join(shortest_path))
 print("Jarak total:", shortest_distance)
 ```
 
+4. **Hasil**:
+   - Jalur Terpendek: `H -> P2 -> P3 -> P4 -> RS`
+   - Jarak Total: `17`
+
+#### Kelebihan dan Kekurangan Dijkstra
+- **Kelebihan**: Hasil yang optimal dan pasti untuk graf berbobot non-negatif.
+- **Kekurangan**: Kurang efisien pada graf yang besar karena memeriksa semua kemungkinan lintasan.
+
+---
+
 ### Algoritma A-Star (A*)
-Algoritma A-Star adalah metode pencarian jalur terpendek yang memadukan biaya perjalanan aktual (g(n)) dan estimasi heuristik ke tujuan (h(n)) untuk menemukan rute optimal. Algoritma ini sangat efisien dalam menyelesaikan masalah pencarian jalur pada graf kompleks.
+**Deskripsi**: 
+Algoritma A-Star adalah metode pencarian jalur terpendek yang menggabungkan pendekatan greedy dan heuristik untuk meningkatkan efisiensi. Fungsi evaluasi utama yang digunakan adalah:
+\[ f(n) = g(n) + h(n) \]
+- **g(n)**: Biaya dari simpul awal ke simpul saat ini.
+- **h(n)**: Perkiraan biaya dari simpul saat ini ke simpul tujuan (heuristik).
 
-- Jalur yang dihasilkan: **I → E → RS** dengan total biaya 11.
+Algoritma ini efektif pada graf besar karena membatasi evaluasi hanya pada simpul yang diprediksi relevan oleh heuristik.
 
-#### Kode Implementasi (Python):
+#### Implementasi
+1. **Graf dan Heuristik**:
+   - Graf melambangkan jaringan jalan dengan bobot sebagai biaya perjalanan antar simpul.
+   - Fungsi heuristik `h(n)` merepresentasikan estimasi jarak ke tujuan. Dalam studi kasus ini, nilai heuristik ditentukan berdasarkan jarak geometris atau estimasi sederhana.
+
+2. **Langkah Utama**:
+   - **Inisialisasi**: Memulai dari simpul awal (I) dengan nilai heuristik awal.
+   - **Evaluasi Tetangga**: Untuk setiap simpul tetangga, menghitung nilai `f(n)` berdasarkan biaya perjalanan aktual dan estimasi ke tujuan.
+   - **Pencarian Jalur**: Proses berlanjut hingga simpul tujuan tercapai.
+
+3. **Kode Python**:
 ```python
 import heapq
 
@@ -88,9 +119,9 @@ def a_star_algorithm(graph, heuristics, start, goal):
     while open_list:
         f, g, current, path = heapq.heappop(open_list)
         if current == goal:
-            total_cost = g + heuristics[start]  
+            total_cost = g  # Biaya total dihitung dari simpul awal ke tujuan
             return path + [current], total_cost
-       
+
         closed_list.add(current)
 
         for neighbor, cost in graph[current].items():
@@ -112,6 +143,14 @@ shortest_path, total_cost = a_star_algorithm(graph, heuristics, start_node, goal
 print("Jalur terpendek:", " -> ".join(shortest_path))
 print("Biaya total:", total_cost)
 ```
+
+4. **Hasil**:
+   - Jalur Terpendek: `I -> E -> RS`
+   - Total Biaya: `11`
+
+#### Kelebihan dan Kekurangan A-Star
+- **Kelebihan**: Efisien untuk graf besar karena memanfaatkan heuristik.
+- **Kekurangan**: Keakuratan bergantung pada kualitas fungsi heuristik yang digunakan.
 
 ---
 
